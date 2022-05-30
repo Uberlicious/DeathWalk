@@ -5,27 +5,41 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 public class Effects : MonoBehaviour {
-    Volume _globalVolume;
-    
+    VolumeProfile _globalVolume;
+
     // Start is called before the first frame update
     void Start()
     {
-        _globalVolume = GetComponent<Volume>();
+        _globalVolume = GetComponent<Volume>().sharedProfile;
         ToggleGhostEffects(false);
     }
 
     public void ToggleGhostEffects(bool turnOn)
     {
-        VolumeProfile profile = _globalVolume.sharedProfile;
-        if (!profile.TryGet<Vignette>(out var vignette))
+        if (!_globalVolume.TryGet<Vignette>(out var vignette))
         {
-            vignette = profile.Add<Vignette>(turnOn);
+            vignette = _globalVolume.Add<Vignette>(turnOn);
         }
         vignette.active = turnOn;
     
-        if (!profile.TryGet<ColorAdjustments>(out var colorAdjustments))
+        if (!_globalVolume.TryGet<ColorAdjustments>(out var colorAdjustments))
         {
-            colorAdjustments = profile.Add<ColorAdjustments>(turnOn);
+            colorAdjustments = _globalVolume.Add<ColorAdjustments>(turnOn);
+        }
+        colorAdjustments.active = turnOn;
+    }
+
+    public void ToggleDeathEffects(bool turnOn)
+    {
+        if (!_globalVolume.TryGet<Vignette>(out var vignette))
+        {
+            vignette = _globalVolume.Add<Vignette>(turnOn);
+        }
+        vignette.active = turnOn;
+        
+        if (!_globalVolume.TryGet<ColorAdjustments>(out var colorAdjustments))
+        {
+            colorAdjustments = _globalVolume.Add<ColorAdjustments>(turnOn);
         }
         colorAdjustments.active = turnOn;
     }

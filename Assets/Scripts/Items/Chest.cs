@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class Chest : MonoBehaviour {
 	[SerializeField] GameObject chestLid;
 	[SerializeField] TextMeshPro hoverText;
@@ -38,10 +39,11 @@ public class Chest : MonoBehaviour {
 	void FloatItem()
 	{
 		item.SetActive(true);
+		Vector3 itemPos = item.transform.position;
 		LTSeq seq = LeanTween.sequence();
-		seq.append(LeanTween.moveY(item, 0.7f, 1f));
+		seq.append(LeanTween.moveY(item, itemPos.y + 0.7f, 1f));
 		item.GetComponent<SphereCollider>().enabled = true;
-		seq.append(LeanTween.moveY(item, 0.5f, 1f).setLoopType(LeanTweenType.pingPong));
+		seq.append(LeanTween.moveY(item, itemPos.y + 0.5f, 1f).setLoopType(LeanTweenType.pingPong));
 	}
 	
 	void OnTriggerEnter(Collider other)

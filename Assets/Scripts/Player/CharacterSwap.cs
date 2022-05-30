@@ -23,6 +23,7 @@ public class CharacterSwap : MonoBehaviour {
     Inventory _inventory;
     SceneManage _sceneManage;
     PassThroughParent[] _passThroughParent;
+    bool _onRagdoll;
 
     void Start()
     {
@@ -31,8 +32,13 @@ public class CharacterSwap : MonoBehaviour {
         mc_movement = mainCharacter.GetComponent<ThirdPersonMovement>();
         _inventory = GetComponent<Inventory>();
         _sceneManage = FindObjectOfType<SceneManage>();
-        _passThroughParent = FindObjectsOfType<PassThroughParent>();
+        GetPassThroughParents();
         SetGhostsInnactive();
+    }
+
+    public void GetPassThroughParents()
+    {
+        _passThroughParent = FindObjectsOfType<PassThroughParent>();
     }
 
     void SetGhostsInnactive()
@@ -63,6 +69,7 @@ public class CharacterSwap : MonoBehaviour {
         if (mainCharacter.activeInHierarchy)
         {
             mainCharacter.SetActive(false);
+            if (_mainCharacterRagdollInstance != null) return;
             _mainCharacterRagdollInstance = Instantiate(mainCharacterRagdoll, mainCharacter.transform.position, mainCharacter.transform.rotation);
             _mainCharacterRagdollInstance.gameObject.transform.position = mainCharacter.transform.position;
             _mainCharacterRagdollInstance.gameObject.transform.rotation = mainCharacter.transform.rotation;
@@ -73,6 +80,7 @@ public class CharacterSwap : MonoBehaviour {
         else
         {
             if (character == null) return;
+            if (_ghostRagdollInstance != null) return;
             character.gameObject.SetActive(false);
             _ghostRagdollInstance = Instantiate(ghostRandoll, character.transform.position, character.transform.rotation);
             _ghostRagdollInstance.gameObject.transform.position = character.transform.position;
@@ -83,6 +91,7 @@ public class CharacterSwap : MonoBehaviour {
 
         if (isDead)
         {
+            _inventory.RemovePotion();
             _sceneManage.ProcessDeath();
             if (_passThroughParent == null) return;
             ResetTransparencyOnPassThrough();
@@ -94,6 +103,7 @@ public class CharacterSwap : MonoBehaviour {
         if (mainCharacter.activeInHierarchy)
         {
             mainCharacter.SetActive(false);
+            if (_mainCharacterRagdollInstance != null) return;
             _mainCharacterRagdollInstance = Instantiate(mainCharacterRagdoll, mainCharacter.transform.position, mainCharacter.transform.rotation);
             _mainCharacterRagdollInstance.gameObject.transform.position = mainCharacter.transform.position;
             _mainCharacterRagdollInstance.gameObject.transform.rotation = mainCharacter.transform.rotation;
@@ -104,16 +114,18 @@ public class CharacterSwap : MonoBehaviour {
         else
         {
             if (character == null) return;
+            if (_ghostRagdollInstance != null) return;
             character.gameObject.SetActive(false);
             _ghostRagdollInstance = Instantiate(ghostRandoll, character.transform.position, character.transform.rotation);
             _ghostRagdollInstance.gameObject.transform.position = character.transform.position;
             _ghostRagdollInstance.gameObject.transform.rotation = character.transform.rotation;
             _ghostRagdollInstance.gameObject.SetActive(true);
-            _mainCharacterRagdollInstance.SetRagdollVelocity(velocity);
+            _ghostRagdollInstance.SetRagdollVelocity(velocity);
         }
 
         if (isDead)
         {
+            _inventory.RemovePotion();
             _sceneManage.ProcessDeath();
             if (_passThroughParent == null) return;
             ResetTransparencyOnPassThrough();
@@ -122,6 +134,8 @@ public class CharacterSwap : MonoBehaviour {
 
     public void SwapBackToMain()
     {
+        if (!_onRagdoll) return;
+        Debug.Log("OnRagdoll");
         DestroyRagdoll();
         mainCharacter.transform.position = _activeCharacter.gameObject.transform.position;
         mainCharacter.transform.rotation = _activeCharacter.gameObject.transform.rotation;
@@ -179,5 +193,10 @@ public class CharacterSwap : MonoBehaviour {
         {
             parent.ResetMaterials();
         }
+    }
+
+    public void OnRagdoll(bool status)
+    {
+        _onRagdoll = status;
     }
 }

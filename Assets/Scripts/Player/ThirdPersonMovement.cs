@@ -2,33 +2,37 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.LWRP;
 
 public class ThirdPersonMovement : MonoBehaviour {
 
+    [Header("General")]
     public CharacterController controller;
     public Transform mainCamera;
     public Transform groundCheck;
     public Animator animator = null;
-    public float groundDistance = 0.4f;
-    public LayerMask groundMask;
-
     public bool isDead = false;
     
+    [Header("Movement")]
     public float speed = 6f;
     public float turnSmoothTime = 0.1f;
     public float turnSmoothVelocity;
 
+    [Header("Jumping")]
     public bool canJump = true;
+    public LayerMask groundMask;
+    public float groundDistance = 0.4f;
     public float jumpHeight = 3f;
     public float gravity = -9.81f;
+    public int jumpLeeway = 3;
 
     Vector3 _velocity;
     Vector3 _overallVelocity;
     public Vector3 OverallVelocity => _overallVelocity;
     Vector3 _moveDir;
-    bool _isGrounded;
+    bool _isGrounded = true;
     bool _canMove;
+    bool jumpCheck;
+    int jumpTimer = 0;
 
     void Start()
     {
@@ -53,7 +57,25 @@ public class ThirdPersonMovement : MonoBehaviour {
 
     void Movement()
     {
-        _isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        jumpCheck = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        switch (jumpCheck)
+        {
+            case true:
+                _isGrounded = true;
+                jumpTimer = 0;
+                break;
+            
+            case false:
+            {
+                if (jumpTimer >= jumpLeeway)
+                {
+                    _isGrounded = false;
+                }
+                jumpTimer++;
+                break;
+            }
+        }
+
         if (!_canMove && _isGrounded) _canMove = _isGrounded;
         animator.SetBool("Grounded", _isGrounded);
 
@@ -87,6 +109,8 @@ public class ThirdPersonMovement : MonoBehaviour {
         if (Input.GetButtonDown("Jump") && _isGrounded && canJump)
         {
             _velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            _isGrounded = false;
+            animator.SetBool("Grounded", _isGrounded);
         }
 
         _overallVelocity = _moveDir + new Vector3(0f, _velocity.y);

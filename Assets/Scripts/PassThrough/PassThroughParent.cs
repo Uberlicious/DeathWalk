@@ -7,11 +7,11 @@ public class PassThroughParent : MonoBehaviour {
 
     public void SendTransparent()
     {
-        BroadcastMessage("SetTransparent", _transparent);
+        BroadcastMessage("SetTransparent", _transparent, SendMessageOptions.DontRequireReceiver);
     }
 
     public void ResetMaterials()
     {
-        BroadcastMessage("ResetMaterial");
+        BroadcastMessage("ResetMaterial", SendMessageOptions.DontRequireReceiver);
     }
 }

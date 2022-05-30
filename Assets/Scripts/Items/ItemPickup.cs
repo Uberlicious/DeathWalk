@@ -28,7 +28,6 @@ public class ItemPickup : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E) && _insideTigger)
         {
-            Debug.Log("pickup item");
             bool added = _inventory.AddPotion(potionColor);
             if (added)
             {

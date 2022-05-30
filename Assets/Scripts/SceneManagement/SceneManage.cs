@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +13,7 @@ public class SceneManage : MonoBehaviour {
     [SerializeField] Interface _interface;
     [SerializeField] GameObject startingFloor;
     [SerializeField] List<GameObject> levelPrefabs = new List<GameObject>();
+    [SerializeField] ThirdPersonMovement thirdPersonMovementScript;
 
     List<GameObject> _loadedLevels = new List<GameObject>();
     public List<GameObject> LoadedLevels => _loadedLevels;
@@ -19,10 +21,19 @@ public class SceneManage : MonoBehaviour {
     // Loaded floor Object / isShown
     Dictionary<GameObject, bool> _shownFloors = new Dictionary<GameObject, bool>();
 
+    CharacterSwap _cs;
+    TypeText _typeText;
+    float _debounce = 2f;
+    float _floorLastTriggered;
+
     void Start()
     {
         LoadedLevels.Add(startingFloor);
         _shownFloors.Add(startingFloor, true);
+        _cs = FindObjectOfType<CharacterSwap>();
+        _typeText = FindObjectOfType<TypeText>();
+        _floorLastTriggered = Time.time;
+        Debug.Log(_floorLastTriggered);
     }
 
     public void ProcessDeath()
@@ -33,8 +44,20 @@ public class SceneManage : MonoBehaviour {
     IEnumerator WaitAndReset()
     {
         WaitForSeconds wait = new WaitForSeconds(waitTime);
+        if (_interface == null) GetInterface();
         _interface.DisplayDeathText(waitTime);
         yield return wait;
+        ReloadScene();
+    }
+
+    void GetInterface()
+    {
+        _interface = FindObjectOfType<Interface>();
+    }
+    
+
+    public void ReloadScene()
+    {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -43,13 +66,17 @@ public class SceneManage : MonoBehaviour {
         GameObject nextFloorObj = Instantiate(nextFloor);
         _loadedLevels.Add(nextFloorObj);
         _shownFloors.Add(nextFloorObj, true);
+        _cs.GetPassThroughParents();
         return true;
     }
 
     public bool TogglePreviousFloor(int index)
     {
         GameObject previousFloor = _loadedLevels[index - 1];
-        Debug.Log($"Toggle Floor: {previousFloor}");
+        var timeCompare = Time.time - _floorLastTriggered;
+        Debug.Log(timeCompare);
+        if (timeCompare < _debounce) return false;
+        _floorLastTriggered = Time.time;
         if (previousFloor)
         {
             bool showPreviousFloor = _shownFloors[previousFloor];

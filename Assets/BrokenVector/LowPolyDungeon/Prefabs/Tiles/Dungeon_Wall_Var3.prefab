@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5675712537767187964}
   - component: {fileID: 5675712537766221628}
   - component: {fileID: 5675712537762195292}
+  - component: {fileID: 1377738938670111449}
   m_Layer: 0
   m_Name: Dungeon_Wall_Var3
   m_TagString: Untagged
@@ -33,7 +34,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5675712537767187964
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -98,3 +99,16 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -7322927112031727365, guid: ab61c646b6bbc5c498e1e835ea9ac264, type: 3}
+--- !u!65 &1377738938670111449
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5675712537768479228}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4.0220184, y: 5.18272, z: 0.49208617}
+  m_Center: {x: 0.011009693, y: 2.3913598, z: -2.0349193}

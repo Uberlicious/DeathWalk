@@ -17,21 +17,36 @@ public class Interface : MonoBehaviour {
 
 	float _countdown;
 
+	void Awake()
+	{
+		int interfaceObj = FindObjectsOfType<Interface>().Length;
+		if (interfaceObj > 1)
+		{
+			Destroy(gameObject);
+		}
+		else
+		{
+			DontDestroyOnLoad(gameObject);
+		}
+	}
+	
 	public void DisplayDeathText(float time)
 	{
-		youDied.gameObject.SetActive(true);
 		_countdown = time;
-		StartCoroutine(UpdateDeathTimer());
+		// StartCoroutine(UpdateDeathTimer());
+		ToggleDeathText();
+		LeanTween.value(countdownText.gameObject, updateDeathTimerCallback, 5f, 0f, time).setOnComplete(ToggleDeathText);
 	}
 
-	IEnumerator UpdateDeathTimer()
+	void updateDeathTimerCallback(float f, float v)
 	{
-		while (_countdown > 0)
-		{
-			countdownText.text = $"Reset in: {_countdown}";
-			_countdown--;
-			yield return new WaitForSeconds(1f);
-		}
+		countdownText.text = $"Reset in {Mathf.Ceil(f)}";
+	}
+	
+	void ToggleDeathText()
+	{
+		bool deathText = youDied.gameObject.activeSelf;
+		youDied.gameObject.SetActive(!deathText);
 	}
 
 	public void ShowBottle(String color)
